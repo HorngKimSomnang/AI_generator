@@ -2,14 +2,18 @@
     "name": "ai-generator",
     "version": "1.0.0",
     "description": "",
+    "workspaces": [
+        "backend",
+        "frontend"
+    ],
     "scripts": {
         "start": "npm run start:backend & npm run start:frontend",
-        "start:backend": "cd backend && npm start",
-        "start:frontend": "cd frontend && npm run dev",
+        "start:backend": "npm start -w backend",
+        "start:frontend": "npm run dev -w frontend",
         "dev": "npm run dev:backend & npm run dev:frontend",
-        "dev:backend": "cd backend && npm run dev",
-        "dev:frontend": "cd frontend && npm run dev",
-        "install:all": "npm install --prefix backend && npm install --prefix frontend",
+        "dev:backend": "npm run dev -w backend",
+        "dev:frontend": "npm run dev -w frontend",
+        "install:all": "npm install",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
