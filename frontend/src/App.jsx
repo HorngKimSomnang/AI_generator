@@ -122,7 +122,8 @@ function App() {
     setDocumentation('');
 
     try {
-      const response = await axios.post('http://localhost:3001/api/generate-docs', {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await axios.post(`${API_URL}/api/generate-docs`, {
         code,
         language
       });
