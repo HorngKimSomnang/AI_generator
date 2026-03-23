@@ -17,8 +17,7 @@ import {
   FileCheck,
   TrendingUp,
   ChevronDown,
-  Check,
-  Download
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -151,8 +150,7 @@ function App() {
         outputFormat,
         tone
       });
-      // Added .trim() to ensure no leading whitespace cuts off the first letter 'E'
-      const result = response.data.documentation.trim();
+      const result = response.data.documentation;
       setDocumentation(result);
       simulateStreaming(result);
     } catch (err) {
@@ -311,14 +309,13 @@ function App() {
                   <div className="relative group/result">
                     <div className={`absolute -inset-[1px] bg-gradient-to-r from-brand-secondary via-transparent to-brand-primary rounded-3xl transition-opacity duration-700 blur-[2px] ${documentation ? 'opacity-40' : 'opacity-10'}`} />
                     <div className="relative premium-card rounded-3xl h-[480px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
-                      <div className="absolute top-6 right-8 z-[110] flex items-center gap-4">
+                      <div className="absolute top-6 right-8 z-[110] flex items-center gap-3">
                         {documentation && (
                           <>
                             <button
                               onClick={downloadAsMarkdown}
-                              className="px-6 py-2.5 rounded-xl bg-brand-primary text-white shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                              className="px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg bg-brand-primary text-white shadow-brand-primary/20 hover:shadow-brand-primary/40 hover:-translate-y-0.5 active:translate-y-0"
                             >
-                              <Download size={14} />
                               <span>Download</span>
                             </button>
                             <button
