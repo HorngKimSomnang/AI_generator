@@ -222,69 +222,18 @@ function App() {
                 </p>
               </div>
 
-              <div className="grid lg:grid-cols-4 gap-10 items-start mt-20">
-                {/* Configuration Sidebar */}
-                <aside className="lg:col-span-1 flex flex-col gap-8 bg-white/[0.03] p-8 rounded-3xl border border-white/[0.05] backdrop-blur-xl">
-                  <div className="flex flex-col gap-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary">Engine Configuration</h4>
-                    
-                    <div className="flex flex-col gap-4">
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Detail Level</span>
-                      <div className="grid grid-cols-1 gap-2">
-                        {['Brief', 'Standard', 'In-depth'].map(level => (
-                          <button
-                            key={level}
-                            onClick={() => setDetailLevel(level)}
-                            className={`px-4 py-2 text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border ${detailLevel === level ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'}`}
-                          >
-                            {level}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4">
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Output Format</span>
-                      <div className="grid grid-cols-1 gap-2">
-                        {['Standard DocBlocks', 'Markdown', 'Wiki'].map(format => (
-                          <button
-                            key={format}
-                            onClick={() => setOutputFormat(format)}
-                            className={`px-4 py-2 text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border ${outputFormat === format ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'}`}
-                          >
-                            {format}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4">
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Tone</span>
-                      <div className="grid grid-cols-1 gap-2">
-                        {['Technical', 'Academic', 'Simplified'].map(t => (
-                          <button
-                            key={t}
-                            onClick={() => setTone(t)}
-                            className={`px-4 py-2 text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border ${tone === t ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'}`}
-                          >
-                            {t}
-                          </button>
-                        ))}
-                      </div>
+              <div className="grid lg:grid-cols-2 gap-10 items-start mt-20">
+                {/* Script Input */}
+                <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="flex flex-col gap-6">
+                  <div className="flex items-center px-2">
+                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
+                      <Code2 size={18} className="text-brand-primary" />
+                      <span>Script Input</span>
                     </div>
                   </div>
-                </aside>
-
-                <div className="lg:col-span-3 grid lg:grid-cols-2 gap-10 items-start">
-                  {/* Script Input moved into grid */}
-                  <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
-                    <div className="flex items-center px-2">
-                      <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
-                        <Code2 size={18} className="text-brand-primary" />
-                        <span>Script Input</span>
-                      </div>
-                    </div>
-                    <div className="relative premium-card rounded-3xl overflow-hidden backdrop-blur-3xl bg-bg-card/60 h-[520px]">
+                  <div className="relative group/input">
+                    <div className="absolute -inset-[1px] bg-gradient-to-r from-brand-primary via-transparent to-brand-secondary rounded-3xl opacity-40 group-focus-within/input:opacity-100 transition-opacity duration-700 blur-[2px]" />
+                    <div className="relative premium-card rounded-3xl overflow-hidden backdrop-blur-3xl bg-bg-card/60 h-[480px]">
                       <div className="absolute top-6 left-8 right-8 z-[110] flex items-center justify-between pointer-events-none">
                         <div className="pointer-events-auto">
                           <CustomDropdown value={language} onChange={setLanguage} options={languages} />
@@ -293,7 +242,7 @@ function App() {
                           <button
                             onClick={handleGenerate}
                             disabled={!code.trim() || isLoading}
-                            className="px-6 py-2.5 bg-brand-primary text-white rounded-xl transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 flex items-center gap-2"
+                            className="px-6 py-2.5 bg-brand-primary text-white rounded-xl transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 disabled:hover:translate-y-0 flex items-center gap-2"
                           >
                             {isLoading ? <><Loader2 className="animate-spin" size={14} /><span>Processing...</span></> : <><Sparkles size={14} /><span>Run Synthesis</span></>}
                           </button>
@@ -308,31 +257,36 @@ function App() {
                         disabled={isLoading}
                       />
                     </div>
-                  </motion.div>
+                  </div>
+                </motion.div>
 
-                  {/* Result Output moved into grid */}
-                  <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
-                    <div className="flex items-center px-2 text-xs font-black uppercase tracking-[0.2em] text-text-white/60 gap-3">
+                {/* Result Section */}
+                <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="flex flex-col gap-6">
+                  <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
                       <FileText size={18} className="text-brand-secondary" />
                       <span>GENERATED SYNTHESIS</span>
                     </div>
-                    <div className="relative premium-card rounded-3xl h-[520px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
+                  </div>
+                  <div className="relative group/result">
+                    <div className={`absolute -inset-[1px] bg-gradient-to-r from-brand-secondary via-transparent to-brand-primary rounded-3xl transition-opacity duration-700 blur-[2px] ${documentation ? 'opacity-40' : 'opacity-10'}`} />
+                    <div className="relative premium-card rounded-3xl h-[480px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
                       <div className="absolute top-6 right-8 z-[110]">
                         {documentation && (
                           <button
                             onClick={() => { navigator.clipboard.writeText(documentation); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                            className={`px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${copied ? 'bg-emerald-500 text-white' : 'bg-brand-secondary text-white'}`}
+                            className={`px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${copied ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-brand-secondary text-white shadow-brand-secondary/20 hover:shadow-brand-secondary/40'}`}
                           >
                             {copied ? <Check size={14} /> : <span>Copy</span>}
                           </button>
                         )}
                       </div>
                       <div className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20">
-                        {error ? <div className="h-full flex flex-col items-center justify-center text-center gap-6"><Terminal size={48} className="text-red-500/50" /><p className="text-sm text-slate-500">{error}</p></div> : documentation ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{documentation}</ReactMarkdown> : <div className="h-full flex flex-col items-center justify-center opacity-40"><ChevronRight size={40} className="text-slate-600" /></div>}
+                        {error ? <div className="h-full flex flex-col items-center justify-center text-center gap-6 py-20"><Terminal size={48} className="text-red-500/50" /><div><h3 className="text-xl font-bold text-white mb-2">Synthesis Failed</h3><p className="text-sm text-slate-500 max-w-sm">{error}</p></div></div> : documentation ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{documentation}</ReactMarkdown> : <div className="h-full flex flex-col items-center justify-center text-center gap-8 py-20"><div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center animate-float"><ChevronRight size={40} className="text-slate-600" /></div><p className="text-xl font-medium text-slate-500 tracking-tight">Awaiting input... <br /></p></div>}
                       </div>
                     </div>
-                  </motion.div>
-                </div>
+                  </div>
+                </motion.div>
               </div>
 
               {/* Core Features */}
