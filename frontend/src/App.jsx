@@ -17,7 +17,8 @@ import {
   FileCheck,
   TrendingUp,
   ChevronDown,
-  Check
+  Check,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -315,10 +316,10 @@ function App() {
                           <>
                             <button
                               onClick={downloadAsMarkdown}
-                              className="px-6 py-2.5 rounded-xl border-2 border-brand-primary/20 bg-brand-primary/5 text-slate-300 hover:text-white hover:border-brand-primary/50 hover:bg-brand-primary/10 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
+                              className="px-6 py-2.5 rounded-xl bg-brand-primary text-white shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
                             >
-                              <Sparkles size={12} />
-                              Download .md
+                              <Download size={14} />
+                              <span>Download</span>
                             </button>
                             <button
                               onClick={() => { navigator.clipboard.writeText(documentation); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
