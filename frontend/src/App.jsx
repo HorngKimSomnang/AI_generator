@@ -220,7 +220,7 @@ function App() {
             className="flex flex-col gap-6"
           >
             <div className="flex items-center px-2">
-              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-white/50">
+              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
                 <Code2 size={18} className="text-brand-primary" />
                 <span>Script Input</span>
               </div>
@@ -286,7 +286,7 @@ function App() {
             className="flex flex-col gap-6"
           >
             <div className="flex items-center justify-between px-2">
-              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-white/50">
+              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
                 <FileText size={18} className="text-brand-secondary" />
                 <span>GENERATED SYNTHESIS</span>
               </div>
