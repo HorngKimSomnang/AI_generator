@@ -124,13 +124,19 @@ function App() {
 
   // Typewriter effect simulation
   const simulateStreaming = (text) => {
-    setStreamingDocumentation("");
-    let i = 0;
+    if (!text) return;
+    // Start with the first character immediately to trigger the UI switch without skipping
+    setStreamingDocumentation(text.charAt(0));
+    
+    let i = 1;
     const interval = setInterval(() => {
+      if (i >= text.length) {
+        clearInterval(interval);
+        return;
+      }
       setStreamingDocumentation((prev) => prev + text.charAt(i));
       i++;
-      if (i >= text.length) clearInterval(interval);
-    }, 10);
+    }, 15); // Slightly slower for better stability
   };
 
   const handleGenerate = async () => {
