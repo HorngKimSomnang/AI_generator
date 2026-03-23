@@ -55,9 +55,6 @@ DOCUMENTATION STANDARDS:
      ### Complexity Analysis
      [Using the 4-step CoT method defined below]
 
-     ### Code Preview
-     [The documented code wrapped in markdown blocks e.g., \`\`\`js or \`\`\`php]
-
 4. Complexity Analysis (Strict Chain-of-Thought):
    - You MUST follow this strict process before stating the Big O:
    - **Step 1: Identify Structures**: List every loop (for, while, foreach), nested structure, and recursive call.
@@ -95,18 +92,6 @@ A recursive function designed to compute factorials efficiently through results-
   - **Time Complexity**: O(n) for the first run, O(1) for subsequent cached runs.
   - **Space Complexity**: O(n) for both recursion stack and map storage.
 
-### Code Preview
-\`\`\`js
-/**
- * Calculates the factorial of a number using memoization.
- * 
- * @param {number} n - The non-negative integer.
- * @returns {number} The calculated factorial.
- * @throws {Error} If input is negative.
- */
-function memoizedFactorial(n) { ... }
-\`\`\`
-
 Example 2 (PHP):
 User Input: PHP method for calculating order total.
 Output:
@@ -135,26 +120,20 @@ A simple utility to aggregate the total cost of a collection of items.
   - **Time Complexity**: O(n).
   - **Space Complexity**: O(1).
 
-### Code Preview
-\`\`\`php
-/**
- * Calculates order total.
- * 
- * @param array $items List of items.
- * @return float Total cost.
- */
- public function calculateTotal(array $items): float { ... }
-\`\`\`
+5. INPUT VALIDATION & LANGUAGE ENFORCEMENT (MANDATORY):
+   - Step 1: **Inspect the Input**: Determine if the input is actually code (contains functions, classes, logic) or just conversation/sentences/words/letters.
+   - Step 2: **Language Verification**: If it is code, identify if it matches the [SELECTED_LANGUAGE] from the dropdown.
 
-Final Note: 
-1. **Identify Language**: The user has selected a language from the dropdown menu (provided in the user prompt).
-2. **Validation Step**: Inspect the provided code input.
-3. Mismatch Action: If the code is written in a different language than the selection (e.g., dropdown is "PHP" but code is "JS"), STOP immediately. provide only the following direct message (replacing [DETECTED_LANGUAGE] and [SELECTED_LANGUAGE] with the actual languages):
-   "It seems that you've provided [DETECTED_LANGUAGE] code in the [SELECTED_LANGUAGE] input section. 
-   
-   Here's the precise error message you should display: 
-   \"Error: Language Mismatch. Please correct the dropdown language to match your code and run the input again.\""
-4. Success Action: If it matches, proceed with the established architectural documentation format.
+   - **SCENARIO A: LANGUAGE MISMATCH**
+     If the code is in a different language than the selection (e.g., dropdown is "PHP" but code is "JS"), perform NO documentation. Output ONLY this exact string:
+     "Error: Language Mismatch. Please correct the dropdown language to match your code and run the input again."
+
+   - **SCENARIO B: NON-CODE INPUT**
+     If the input is just conversation, a sentence, a word, or letters (e.g., "hello", "how are you"), perform NO documentation. Output ONLY this exact string:
+     "Error: Invalid Input. Please provide valid [SELECTED_LANGUAGE] code (functions or classes) that matches your dropdown selection and run the input again."
+
+   - **SCENARIO C: VALID MATCH**
+     Proceed with the full documentation format.
 `;
 
 app.post('/api/generate-docs', async (req, res) => {
