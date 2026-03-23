@@ -186,6 +186,14 @@ function App() {
       }, { signal: abortControllerRef.current.signal });
       
       const result = response.data.documentation;
+      
+      // If the AI output is a formatted error string, treat it as a UI error
+      if (result.startsWith('Error:')) {
+        setError(result);
+        setIsLoading(false);
+        return;
+      }
+
       setDocumentation(result);
       simulateStreaming(result);
     } catch (err) {
