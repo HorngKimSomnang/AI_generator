@@ -288,7 +288,7 @@ function App() {
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-white/50">
                 <FileText size={18} className="text-brand-secondary" />
-                <span>Generated Synthesis</span>
+                <span>GENERATED SYNTHESIS</span>
               </div>
             </div>
 
