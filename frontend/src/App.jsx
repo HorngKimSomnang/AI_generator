@@ -114,6 +114,7 @@ function App() {
   const [detailLevel, setDetailLevel] = useState('Standard');
   const [outputFormat, setOutputFormat] = useState('Standard DocBlocks');
   const [tone, setTone] = useState('Technical');
+  const [selectedPlan, setSelectedPlan] = useState('Starter');
   const abortControllerRef = useRef(null);
   const streamingIntervalRef = useRef(null);
 
@@ -497,8 +498,18 @@ function App() {
                         </div>
                       ))}
                     </div>
-                    <button className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all relative z-10 ${tier.featured ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/40' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
-                      Select Plan
+                    <button 
+                      onClick={() => setSelectedPlan(tier.name)}
+                      className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all relative z-10 flex items-center justify-center gap-2 ${selectedPlan === tier.name ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/20' : tier.featured ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/40' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}
+                    >
+                      {selectedPlan === tier.name ? (
+                        <>
+                          <Check size={14} />
+                          <span>Current Plan</span>
+                        </>
+                      ) : (
+                        <span>Select Plan</span>
+                      )}
                     </button>
                   </motion.div>
                 ))}
