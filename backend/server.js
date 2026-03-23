@@ -137,7 +137,13 @@ A simple utility to aggregate the total cost of a collection of items.
 `;
 
 app.post('/api/generate-docs', async (req, res) => {
-  const { code, language = 'JavaScript' } = req.body;
+  const {
+    code,
+    language = 'JavaScript',
+    detailLevel = 'Standard',
+    outputFormat = 'Standard DocBlocks',
+    tone = 'Technical'
+  } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: 'Code is required' });
@@ -150,9 +156,20 @@ app.post('/api/generate-docs', async (req, res) => {
       model: model,
       messages: [
         { role: "system", content: SYSTEM_INSTRUCTION },
-        { role: "user", content: `Dropdown Selection: ${language}\n\nCode Input:\n${code}` }
+        {
+          role: "user",
+          content: `
+        Dropdown Selection: ${language}
+        Detail Level requested: ${detailLevel}
+        Output Format: ${outputFormat}
+        Tone: ${tone}
+
+        Code Input:
+        ${code}
+        `
+        }
       ],
-      max_tokens: 1500,
+      max_tokens: 2000,
     });
 
     const botResponse = response.choices[0].message.content;

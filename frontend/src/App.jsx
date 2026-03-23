@@ -106,6 +106,12 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const [language, setLanguage] = useState('JS');
   const [copied, setCopied] = useState(false);
+  const [activePage, setActivePage] = useState('engine');
+  
+  // Engine Config State
+  const [detailLevel, setDetailLevel] = useState('Standard');
+  const [outputFormat, setOutputFormat] = useState('Standard DocBlocks');
+  const [tone, setTone] = useState('Technical');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -125,7 +131,10 @@ function App() {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await axios.post(`${API_URL}/api/generate-docs`, {
         code,
-        language
+        language,
+        detailLevel,
+        outputFormat,
+        tone
       });
       setDocumentation(response.data.documentation);
     } catch (err) {
@@ -166,9 +175,9 @@ function App() {
           className="flex items-center gap-10"
         >
           <div className="hidden lg:flex items-center gap-10">
-            <a href="#" className="nav-link !text-[11px] uppercase tracking-[0.2em] font-black hover:scale-95">Engine</a>
-            <a href="#" className="nav-link !text-[11px] uppercase tracking-[0.2em] font-black hover:scale-95">Docs</a>
-            <a href="#" className="nav-link !text-[11px] uppercase tracking-[0.2em] font-black hover:scale-95">Pricing</a>
+            <button onClick={() => setActivePage('engine')} className={`nav-link !text-[11px] uppercase tracking-[0.2em] font-black hover:scale-95 ${activePage === 'engine' ? 'text-brand-primary' : ''}`}>Engine</button>
+            <button onClick={() => setActivePage('docs')} className={`nav-link !text-[11px] uppercase tracking-[0.2em] font-black hover:scale-95 ${activePage === 'docs' ? 'text-brand-primary' : ''}`}>Docs</button>
+            <button onClick={() => setActivePage('pricing')} className={`nav-link !text-[11px] uppercase tracking-[0.2em] font-black hover:scale-95 ${activePage === 'pricing' ? 'text-brand-primary' : ''}`}>Pricing</button>
           </div>
 
           <div className="h-5 w-[1px] bg-white/10 hidden md:block" />
@@ -190,255 +199,206 @@ function App() {
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-12 py-20 flex flex-col gap-24 relative z-10">
 
-        {/* Header Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col items-center text-center gap-6 mb-8"
-        >
-          <div className="px-4 py-2 rounded-full bg-brand-primary/5 border border-brand-primary/10 text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary mb-4 animate-pulse">
-            Next Generation AI System
-          </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none text-text-white">
-            Your Code, <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-indigo-400 to-brand-secondary">Documented.</span>
-          </h1>
-          <p className="text-xl text-slate-500 max-w-2xl font-medium leading-relaxed mt-4">
-            Transform messy snippets into professional documentation with advanced few-shot prompting and complexity analysis.
-          </p>
-        </motion.div>
-
-        {/* Action Center */}
-        <div className="grid lg:grid-cols-2 gap-10 items-start mt-20">
-
-          {/* Source Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col gap-6"
-          >
-            <div className="flex items-center px-2">
-              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
-                <Code2 size={18} className="text-brand-primary" />
-                <span>Script Input</span>
-              </div>
-            </div>
-
-            <div className="relative group/input">
-              <div className="absolute -inset-[1px] bg-gradient-to-r from-brand-primary via-transparent to-brand-secondary rounded-3xl opacity-40 group-focus-within/input:opacity-100 transition-opacity duration-700 blur-[2px]" />
-              <div className="relative premium-card rounded-3xl overflow-hidden backdrop-blur-3xl bg-bg-card/60 h-[480px]">
-                {/* Upper Control Bar */}
-                <div className="absolute top-6 left-8 right-8 z-[110] flex items-center justify-between pointer-events-none">
-                  <div className="pointer-events-auto">
-                    <CustomDropdown
-                      value={language}
-                      onChange={setLanguage}
-                      options={languages}
-                    />
-                  </div>
-                  <div className="pointer-events-auto">
-                    <button
-                      onClick={handleGenerate}
-                      disabled={!code.trim() || isLoading}
-                      className="px-6 py-2.5 bg-brand-primary text-white rounded-xl transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-30 disabled:hover:translate-y-0 flex items-center gap-2"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="animate-spin" size={14} />
-                          <span>Processing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={14} />
-                          <span>Run Synthesis</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+        <AnimatePresence mode="wait">
+          {activePage === 'engine' && (
+            <motion.div
+              key="engine-page"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col gap-24"
+            >
+              <div className="flex flex-col items-center text-center gap-6 mb-8">
+                <div className="px-4 py-2 rounded-full bg-brand-primary/5 border border-brand-primary/10 text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary mb-4 animate-pulse">
+                  The Documentation Engine
                 </div>
-
-                <textarea
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="// Paste your logic here..."
-                  className="code-area h-full !pl-10 !pr-0 !pt-28 !pb-20 placeholder-slate-800 custom-scrollbar relative z-10"
-                  spellCheck="false"
-                  disabled={isLoading}
-                />
-
-                {/* Floating Engine Status Indicator with Mask */}
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-bg-card/90 to-transparent pointer-events-none z-[115]" />
-                <div className="absolute bottom-6 left-8 flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-white/[0.04] px-4 py-2 rounded-lg border border-white/[0.06] backdrop-blur-md z-[120]">
-                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                  Neural Engine Active
-                </div>
+                <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none text-text-white">
+                  Your Code, <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-indigo-400 to-brand-secondary">Documented.</span>
+                </h1>
+                <p className="text-xl text-slate-500 max-w-2xl font-medium leading-relaxed mt-4">
+                  Transform messy snippets into professional documentation with advanced few-shot prompting and complexity analysis.
+                </p>
               </div>
-            </div>
-          </motion.div>
 
-          {/* Result Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col gap-6"
-          >
-            <div className="flex items-center justify-between px-2">
-              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
-                <FileText size={18} className="text-brand-secondary" />
-                <span>GENERATED SYNTHESIS</span>
-              </div>
-            </div>
-
-            <div className="relative group/result">
-              <div className={`absolute -inset-[1px] bg-gradient-to-r from-brand-secondary via-transparent to-brand-primary rounded-3xl transition-opacity duration-700 blur-[2px] ${documentation ? 'opacity-40' : 'opacity-10'}`} />
-              <div className="relative premium-card rounded-3xl h-[480px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
-
-                {/* Top Control Bar */}
-                <div className="absolute top-6 right-8 z-[110]">
-                  {documentation && (
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(documentation);
-                        setCopied(true);
-                        setTimeout(() => setCopied(false), 2000);
-                      }}
-                      className={`px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${copied
-                        ? 'bg-emerald-500 text-white shadow-emerald-500/20'
-                        : 'bg-brand-secondary text-white shadow-brand-secondary/20 hover:shadow-brand-secondary/40'
-                        }`}
-                    >
-                      <AnimatePresence mode="wait">
-                        {copied ? (
-                          <motion.div
-                            key="check"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="flex items-center gap-2"
+              <div className="grid lg:grid-cols-4 gap-10 items-start mt-20">
+                {/* Configuration Sidebar */}
+                <aside className="lg:col-span-1 flex flex-col gap-8 bg-white/[0.03] p-8 rounded-3xl border border-white/[0.05] backdrop-blur-xl">
+                  <div className="flex flex-col gap-6">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary">Engine Configuration</h4>
+                    
+                    <div className="flex flex-col gap-4">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Detail Level</span>
+                      <div className="grid grid-cols-1 gap-2">
+                        {['Brief', 'Standard', 'In-depth'].map(level => (
+                          <button
+                            key={level}
+                            onClick={() => setDetailLevel(level)}
+                            className={`px-4 py-2 text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border ${detailLevel === level ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'}`}
                           >
-                            <Check size={14} />
-                            <span>Copied!</span>
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            key="terminal"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="flex items-center gap-2"
-                          >
-                            <span>Copy</span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </button>
-                  )}
-                </div>
-
-                <AnimatePresence mode="wait">
-                  {error ? (
-                    <motion.div
-                      key="error-state"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="h-full flex flex-col items-center justify-center text-center gap-6 py-20"
-                    >
-                      <Terminal size={48} className="text-red-500/50" />
-                      <div>
-                        <h3 className="text-xl font-bold text-white mb-2">Synthesis Failed</h3>
-                        <p className="text-sm text-slate-500 max-w-sm">{error}</p>
+                            {level}
+                          </button>
+                        ))}
                       </div>
-                    </motion.div>
-                  ) : documentation ? (
-                    <motion.div
-                      key="doc-content"
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -30 }}
-                      transition={{ duration: 0.8 }}
-                      className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20"
-                    >
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {documentation}
-                      </ReactMarkdown>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="doc-placeholder"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.6 }}
-                      className="h-full flex flex-col items-center justify-center text-center gap-8 py-20"
-                    >
-                      <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center animate-float">
-                        <ChevronRight size={40} className="text-slate-600" />
-                      </div>
-                      <p className="text-xl font-medium text-slate-500 tracking-tight">
-                        Awaiting input... <br />
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Internal Decorative Glow */}
-                <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-brand-primary/5 blur-[160px] rounded-full pointer-events-none" />
-
-                {documentation && (
-                  <>
-                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-bg-card/90 to-transparent pointer-events-none z-[115]" />
-                    <div className="absolute bottom-6 left-8 flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-white/[0.04] px-4 py-2 rounded-lg border border-white/[0.06] backdrop-blur-md z-[120]">
-                      <div className="w-2 h-2 rounded-full bg-brand-secondary shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
-                      Synthesis Finalized
                     </div>
-                  </>
-                )}
+
+                    <div className="flex flex-col gap-4">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Output Format</span>
+                      <div className="grid grid-cols-1 gap-2">
+                        {['Standard DocBlocks', 'Markdown', 'Wiki'].map(format => (
+                          <button
+                            key={format}
+                            onClick={() => setOutputFormat(format)}
+                            className={`px-4 py-2 text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border ${outputFormat === format ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'}`}
+                          >
+                            {format}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Tone</span>
+                      <div className="grid grid-cols-1 gap-2">
+                        {['Technical', 'Academic', 'Simplified'].map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setTone(t)}
+                            className={`px-4 py-2 text-[10px] uppercase font-black tracking-widest rounded-xl transition-all border ${tone === t ? 'bg-brand-primary text-white border-brand-primary shadow-lg shadow-brand-primary/20' : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/10'}`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+
+                <div className="lg:col-span-3 grid lg:grid-cols-2 gap-10 items-start">
+                  {/* Script Input moved into grid */}
+                  <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
+                    <div className="flex items-center px-2">
+                      <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-text-white/60">
+                        <Code2 size={18} className="text-brand-primary" />
+                        <span>Script Input</span>
+                      </div>
+                    </div>
+                    <div className="relative premium-card rounded-3xl overflow-hidden backdrop-blur-3xl bg-bg-card/60 h-[520px]">
+                      <div className="absolute top-6 left-8 right-8 z-[110] flex items-center justify-between pointer-events-none">
+                        <div className="pointer-events-auto">
+                          <CustomDropdown value={language} onChange={setLanguage} options={languages} />
+                        </div>
+                        <div className="pointer-events-auto">
+                          <button
+                            onClick={handleGenerate}
+                            disabled={!code.trim() || isLoading}
+                            className="px-6 py-2.5 bg-brand-primary text-white rounded-xl transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 flex items-center gap-2"
+                          >
+                            {isLoading ? <><Loader2 className="animate-spin" size={14} /><span>Processing...</span></> : <><Sparkles size={14} /><span>Run Synthesis</span></>}
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        placeholder="// Paste your logic here..."
+                        className="code-area h-full !pl-10 !pr-0 !pt-28 !pb-20 placeholder-slate-800 custom-scrollbar relative z-10"
+                        spellCheck="false"
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </motion.div>
+
+                  {/* Result Output moved into grid */}
+                  <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-6">
+                    <div className="flex items-center px-2 text-xs font-black uppercase tracking-[0.2em] text-text-white/60 gap-3">
+                      <FileText size={18} className="text-brand-secondary" />
+                      <span>GENERATED SYNTHESIS</span>
+                    </div>
+                    <div className="relative premium-card rounded-3xl h-[520px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
+                      <div className="absolute top-6 right-8 z-[110]">
+                        {documentation && (
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(documentation); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                            className={`px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${copied ? 'bg-emerald-500 text-white' : 'bg-brand-secondary text-white'}`}
+                          >
+                            {copied ? <Check size={14} /> : <span>Copy</span>}
+                          </button>
+                        )}
+                      </div>
+                      <div className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20">
+                        {error ? <div className="h-full flex flex-col items-center justify-center text-center gap-6"><Terminal size={48} className="text-red-500/50" /><p className="text-sm text-slate-500">{error}</p></div> : documentation ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{documentation}</ReactMarkdown> : <div className="h-full flex flex-col items-center justify-center opacity-40"><ChevronRight size={40} className="text-slate-600" /></div>}
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </div>
 
-        {/* Core Features Section */}
-        <section className="pt-40 border-t border-white/[0.06] flex flex-col gap-24">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center text-center gap-6"
-          >
-            <h2 className="text-5xl md:text-6xl font-black tracking-tight underline decoration-brand-primary/30 underline-offset-[16px]">Core Architecture</h2>
-            <p className="text-lg text-slate-500 max-w-2xl font-medium leading-relaxed">
-              We leverage cutting-edge neural patterns to transform raw logic into architectural masterpieces.
-            </p>
-          </motion.div>
+              {/* Core Features */}
+              <section className="pt-40 border-t border-white/[0.06] flex flex-col gap-24">
+                <div className="flex flex-col items-center text-center gap-6">
+                  <h2 className="text-5xl md:text-6xl font-black tracking-tight underline decoration-brand-primary/30 underline-offset-[16px]">Core Architecture</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <FeatureCard delay={0.1} icon={<Zap className="text-brand-primary" size={28} />} title="Few-Shot Documentation Engine" reasoning='Using "few-shot" prompting ensure the AI does not just describe the code, but formats it in a way that mimics professional documentation.' />
+                  <FeatureCard delay={0.2} icon={<Brain className="text-brand-secondary" size={28} />} title="Automatic Logic Breakdown" reasoning="It doesn't just summarize; it explains the 'why' behind technical decisions." />
+                  <FeatureCard delay={0.3} icon={<FileCheck className="text-brand-primary" size={28} />} title="Standardized Output Format" reasoning="Ensures consistency across all your documentations blocks." />
+                  <FeatureCard delay={0.4} icon={<TrendingUp className="text-brand-secondary" size={28} />} title="Complexity Analysis" reasoning="Identifies O(n) notation using strict chain-of-thought analysis." />
+                </div>
+              </section>
+            </motion.div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <FeatureCard
-              delay={0.1}
-              icon={<Zap className="text-brand-primary group-hover:animate-pulse" size={28} />}
-              title="Few-Shot Documentation Engine"
-              reasoning='Using "few-shot" prompting (providing examples of industry-standard DocBlocks and READMEs) ensures the AI does not just describe the code, but formats it in a way that mimics professional documentation like JSDoc or PHPdoc.'
-            />
-            <FeatureCard
-              delay={0.2}
-              icon={<Brain className="text-brand-secondary group-hover:animate-pulse" size={28} />}
-              title="Automatic Logic Breakdown"
-              reasoning="It doesn't just summarize; it explains the 'why' behind specific functions. This helps me understand the technical decisions made during the 'vibe coding' process."
-            />
-            <FeatureCard
-              delay={0.3}
-              icon={<FileCheck className="text-brand-primary group-hover:animate-pulse" size={28} />}
-              title="Standardized Output Format"
-              reasoning="By forcing the AI to use a consistent template (Parameters, Return Values, Exceptions), it ensures my project portfolio looks uniform and professional to potential employers."
-            />
-            <FeatureCard
-              delay={0.4}
-              icon={<TrendingUp className="text-brand-secondary group-hover:animate-pulse" size={28} />}
-              title="Complexity Analysis"
-              reasoning="The tool identifies the time and space complexity (O(n) notation), which is a critical skill for my university exams and technical interviews."
-            />
-          </div>
-        </section>
+          {activePage === 'pricing' && (
+            <motion.div
+              key="pricing-page"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col items-center gap-24 py-20"
+            >
+              <div className="flex flex-col items-center text-center gap-6">
+                <div className="px-4 py-2 rounded-full bg-brand-primary/5 border border-brand-primary/10 text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary">The Core Experience</div>
+                <h1 className="text-6xl md:text-7xl font-black tracking-tight">Enterprise Scaling</h1>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8 w-full">
+                {[
+                  { name: 'Starter', price: '$0', features: ['10 Generations/day', 'Standard Tone', 'JSDoc Support'], color: 'slate' },
+                  { name: 'Professional', price: '$29', features: ['Unlimited Generations', 'All Detail Levels', 'Academic Tone'], color: 'brand-primary', featured: true },
+                  { name: 'Enterprise', price: '$99', features: ['Custom Style Guides', 'Priority GPU', 'Dedicated Support'], color: 'brand-secondary' }
+                ].map(tier => (
+                  <div key={tier.name} className={`premium-card p-12 rounded-[40px] flex flex-col gap-10 border transition-all duration-500 hover:scale-[1.02] ${tier.featured ? 'border-brand-primary bg-brand-primary/[0.03] scale-105' : 'border-white/5'}`}>
+                    <div className="flex flex-col gap-2">
+                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{tier.name}</span>
+                       <span className="text-5xl font-black text-text-white">{tier.price}<span className="text-lg font-bold text-slate-500">/mo</span></span>
+                    </div>
+                    <div className="flex flex-col gap-4 flex-1">
+                      {tier.features.map(f => (
+                        <div key={f} className="flex items-center gap-4 text-xs font-bold text-slate-400">
+                          <Check size={16} className="text-brand-primary" />
+                          <span>{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${tier.featured ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/40' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
+                      Select Plan
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {activePage === 'docs' && (
+            <motion.div key="docs-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-40 gap-8">
+              <Terminal size={64} className="text-brand-primary animate-pulse" />
+              <h2 className="text-3xl font-black uppercase tracking-widest">Documentation Hub Coming Soon</h2>
+              <p className="text-slate-500 max-w-md text-center">We are currently synthesizing the most interactive documentation experience in the industry.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </main>
 
