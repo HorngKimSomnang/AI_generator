@@ -107,6 +107,8 @@ function App() {
   const [language, setLanguage] = useState('JS');
   const [copied, setCopied] = useState(false);
   const [activePage, setActivePage] = useState('engine');
+  const [streamingDocumentation, setStreamingDocumentation] = useState('');
+  const [isAnnual, setIsAnnual] = useState(false);
   
   // Engine Config State
   const [detailLevel, setDetailLevel] = useState('Standard');
@@ -120,12 +122,24 @@ function App() {
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
+  // Typewriter effect simulation
+  const simulateStreaming = (text) => {
+    setStreamingDocumentation("");
+    let i = 0;
+    const interval = setInterval(() => {
+      setStreamingDocumentation((prev) => prev + text.charAt(i));
+      i++;
+      if (i >= text.length) clearInterval(interval);
+    }, 10);
+  };
+
   const handleGenerate = async () => {
     if (!code.trim() || isLoading) return;
 
     setIsLoading(true);
     setError(null);
     setDocumentation('');
+    setStreamingDocumentation('');
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -136,13 +150,24 @@ function App() {
         outputFormat,
         tone
       });
-      setDocumentation(response.data.documentation);
+      const result = response.data.documentation;
+      setDocumentation(result);
+      simulateStreaming(result);
     } catch (err) {
       console.error('Error generating docs:', err);
       setError(err.response?.data?.details || err.message || 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const downloadAsMarkdown = () => {
+    const element = document.createElement("a");
+    const file = new Blob([documentation], { type: 'text/markdown' });
+    element.href = URL.createObjectURL(file);
+    element.download = "documentation.md";
+    document.body.appendChild(element);
+    element.click();
   };
 
   const languages = ['JS', 'PHP'];
@@ -256,6 +281,19 @@ function App() {
                         spellCheck="false"
                         disabled={isLoading}
                       />
+
+                      {/* Floating Engine Status Indicator */}
+                      <div className="absolute bottom-6 left-8 flex items-center gap-3 text-[10px] font-black text-slate-500 uppercase tracking-widest bg-white/[0.04] px-4 py-2 rounded-lg border border-white/[0.06] backdrop-blur-md z-[120]">
+                        <motion.div 
+                          animate={{ 
+                            scale: code.length > 0 ? [1, 1.4, 1] : 1,
+                            opacity: code.length > 0 ? [0.6, 1, 0.6] : 0.6
+                          }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" 
+                        />
+                        Neural Engine Active
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -271,18 +309,65 @@ function App() {
                   <div className="relative group/result">
                     <div className={`absolute -inset-[1px] bg-gradient-to-r from-brand-secondary via-transparent to-brand-primary rounded-3xl transition-opacity duration-700 blur-[2px] ${documentation ? 'opacity-40' : 'opacity-10'}`} />
                     <div className="relative premium-card rounded-3xl h-[480px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
-                      <div className="absolute top-6 right-8 z-[110]">
+                      <div className="absolute top-6 right-8 z-[110] flex items-center gap-3">
                         {documentation && (
-                          <button
-                            onClick={() => { navigator.clipboard.writeText(documentation); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                            className={`px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${copied ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-brand-secondary text-white shadow-brand-secondary/20 hover:shadow-brand-secondary/40'}`}
-                          >
-                            {copied ? <Check size={14} /> : <span>Copy</span>}
-                          </button>
+                          <>
+                            <button
+                              onClick={downloadAsMarkdown}
+                              className="px-6 py-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white border border-white/5 transition-all text-[10px] font-black uppercase tracking-widest"
+                            >
+                              Download .md
+                            </button>
+                            <button
+                              onClick={() => { navigator.clipboard.writeText(documentation); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                              className={`px-8 py-2.5 rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${copied ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-brand-secondary text-white shadow-brand-secondary/20 hover:shadow-brand-secondary/40'}`}
+                            >
+                              {copied ? <Check size={14} /> : <span>Copy</span>}
+                            </button>
+                          </>
                         )}
                       </div>
                       <div className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20">
-                        {error ? <div className="h-full flex flex-col items-center justify-center text-center gap-6 py-20"><Terminal size={48} className="text-red-500/50" /><div><h3 className="text-xl font-bold text-white mb-2">Synthesis Failed</h3><p className="text-sm text-slate-500 max-w-sm">{error}</p></div></div> : documentation ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{documentation}</ReactMarkdown> : <div className="h-full flex flex-col items-center justify-center text-center gap-8 py-20"><div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center animate-float"><ChevronRight size={40} className="text-slate-600" /></div><p className="text-xl font-medium text-slate-500 tracking-tight">Awaiting input... <br /></p></div>}
+                        {error ? (
+                          <div className="h-full flex flex-col items-center justify-center text-center gap-6 py-20">
+                            <Terminal size={48} className="text-red-500/50" />
+                            <div>
+                              <h3 className="text-xl font-bold text-white mb-2">Synthesis Failed</h3>
+                              <p className="text-sm text-slate-500 max-sm">{error}</p>
+                            </div>
+                          </div>
+                        ) : isLoading ? (
+                          <div className="h-full flex flex-col items-center justify-center relative">
+                            {/* Neural Scan Bar */}
+                            <motion.div 
+                              initial={{ top: "0%" }}
+                              animate={{ top: "100%" }}
+                              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-primary to-transparent z-[150] opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.5)]"
+                            />
+                            <div className="flex flex-col gap-4 w-full px-10">
+                              <div className="h-4 w-3/4 bg-white/5 rounded-full overflow-hidden relative">
+                                <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 1.5, repeat: Infinity }} className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
+                              </div>
+                              <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden relative">
+                                <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }} className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-secondary/20 to-transparent" />
+                              </div>
+                              <div className="h-4 w-5/6 bg-white/5 rounded-full overflow-hidden relative">
+                                <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }} className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-primary/20 to-transparent" />
+                              </div>
+                            </div>
+                            <span className="mt-10 text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary animate-pulse">Scanning Logic...</span>
+                          </div>
+                        ) : streamingDocumentation ? (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamingDocumentation}</ReactMarkdown>
+                        ) : (
+                          <div className="h-full flex flex-col items-center justify-center text-center gap-8 py-20">
+                            <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center animate-float">
+                              <ChevronRight size={40} className="text-slate-600" />
+                            </div>
+                            <p className="text-xl font-medium text-slate-500 tracking-tight">Awaiting input... <br /></p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -315,18 +400,38 @@ function App() {
               <div className="flex flex-col items-center text-center gap-6">
                 <div className="px-4 py-2 rounded-full bg-brand-primary/5 border border-brand-primary/10 text-[10px] uppercase font-black tracking-[0.3em] text-brand-primary">The Core Experience</div>
                 <h1 className="text-6xl md:text-7xl font-black tracking-tight">Enterprise Scaling</h1>
+                
+                {/* Billing Toggle */}
+                <div className="flex items-center gap-4 bg-white/5 p-1.5 rounded-2xl border border-white/5 mt-4">
+                  <button onClick={() => setIsAnnual(false)} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!isAnnual ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-slate-500'}`}>Monthly</button>
+                  <button onClick={() => setIsAnnual(true)} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isAnnual ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-slate-500'}`}>Yearly (Save 20%)</button>
+                </div>
               </div>
 
               <div className="grid md:grid-cols-3 gap-8 w-full">
                 {[
-                  { name: 'Starter', price: '$0', features: ['10 Generations/day', 'Standard Tone', 'JSDoc Support'], color: 'slate' },
-                  { name: 'Professional', price: '$29', features: ['Unlimited Generations', 'All Detail Levels', 'Academic Tone'], color: 'brand-primary', featured: true },
-                  { name: 'Enterprise', price: '$99', features: ['Custom Style Guides', 'Priority GPU', 'Dedicated Support'], color: 'brand-secondary' }
+                  { name: 'Starter', price: 0, features: ['10 Syntheses/day', 'Standard Tone', 'Basic Complexity'], color: 'slate' },
+                  { name: 'Professional', price: 29, features: ['Unlimited Syntheses', 'Priority Neural Speed', 'GitHub Integration'], color: 'brand-primary', featured: true },
+                  { name: 'Enterprise', price: 'Custom', features: ['Custom Style Guides', 'SSO & IAM', 'Dedicated GPU'], color: 'brand-secondary' }
                 ].map(tier => (
-                  <div key={tier.name} className={`premium-card p-12 rounded-[40px] flex flex-col gap-10 border transition-all duration-500 hover:scale-[1.02] ${tier.featured ? 'border-brand-primary bg-brand-primary/[0.03] scale-105' : 'border-white/5'}`}>
+                  <motion.div 
+                    key={tier.name} 
+                    whileHover={{ scale: 1.02 }}
+                    className={`relative premium-card p-12 rounded-[40px] flex flex-col gap-10 border transition-all duration-500 ${tier.featured ? 'border-brand-primary bg-brand-primary/[0.03] scale-105' : 'border-white/5'} group`}
+                  >
+                    {/* Neural Glow expansion on hover */}
+                    <div className="absolute -inset-[1px] bg-gradient-to-r from-brand-primary to-brand-secondary rounded-[40px] opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-700 pointer-events-none" />
+                    
                     <div className="flex flex-col gap-2">
                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{tier.name}</span>
-                       <span className="text-5xl font-black text-text-white">{tier.price}<span className="text-lg font-bold text-slate-500">/mo</span></span>
+                       <div className="flex items-baseline gap-1">
+                        <span className="text-5xl font-black text-text-white">
+                          {typeof tier.price === 'number' ? (tier.price === 0 ? '$0' : `$${isAnnual ? Math.floor(tier.price * 12 * 0.8) : tier.price}`) : tier.price}
+                        </span>
+                        {typeof tier.price === 'number' && tier.price !== 0 && (
+                          <span className="text-lg font-bold text-slate-500">{isAnnual ? '/yr' : '/mo'}</span>
+                        )}
+                       </div>
                     </div>
                     <div className="flex flex-col gap-4 flex-1">
                       {tier.features.map(f => (
@@ -336,10 +441,10 @@ function App() {
                         </div>
                       ))}
                     </div>
-                    <button className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${tier.featured ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/40' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
+                    <button className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all relative z-10 ${tier.featured ? 'bg-brand-primary text-white shadow-xl shadow-brand-primary/40' : 'bg-white/5 text-slate-300 hover:bg-white/10'}`}>
                       Select Plan
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
