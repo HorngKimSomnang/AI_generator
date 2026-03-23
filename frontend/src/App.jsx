@@ -212,6 +212,7 @@ function App() {
     if (streamingIntervalRef.current) clearInterval(streamingIntervalRef.current);
     
     setLanguage(newLanguage);
+    setCode(''); // Clear the input code when language changes
     setIsLoading(false);
     setError(null);
     setDocumentation('');
