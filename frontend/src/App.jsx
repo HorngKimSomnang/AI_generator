@@ -114,6 +114,8 @@ function App() {
   const [detailLevel, setDetailLevel] = useState('Standard');
   const [outputFormat, setOutputFormat] = useState('Standard DocBlocks');
   const [tone, setTone] = useState('Technical');
+  const abortControllerRef = useRef(null);
+  const streamingIntervalRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -125,22 +127,48 @@ function App() {
   // Typewriter effect simulation
   const simulateStreaming = (text) => {
     if (!text) return;
-    // Start with the first character immediately to trigger the UI switch without skipping
-    setStreamingDocumentation(text.charAt(0));
+    // Clear any existing intervals if we restart
+    if (streamingIntervalRef.current) clearInterval(streamingIntervalRef.current);
     
+    setStreamingDocumentation(text.charAt(0));
     let i = 1;
-    const interval = setInterval(() => {
+    streamingIntervalRef.current = setInterval(() => {
       if (i >= text.length) {
-        clearInterval(interval);
+        clearInterval(streamingIntervalRef.current);
         return;
       }
       setStreamingDocumentation((prev) => prev + text.charAt(i));
       i++;
-    }, 15); // Slightly slower for better stability
+    }, 15);
+  };
+
+  const validateCode = () => {
+    const codeSample = code.trim();
+    if (language === 'JS') {
+      const jsMarkers = ['const', 'let', 'var', 'function', '=>', 'import', 'export'];
+      if (!jsMarkers.some(m => codeSample.includes(m)) && codeSample.includes('$')) {
+        return "Detected PHP code. Please switch the language dropdown to PHP and try again.";
+      }
+    } else if (language === 'PHP') {
+      if (!codeSample.includes('$') && !codeSample.includes('<?php') && codeSample.includes('const')) {
+        return "Detected JavaScript code. Please switch the language dropdown to JS and try again.";
+      }
+    }
+    return null;
   };
 
   const handleGenerate = async () => {
     if (!code.trim() || isLoading) return;
+
+    const validationError = validateCode();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    // Abort previous request
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
 
     setIsLoading(true);
     setError(null);
@@ -155,16 +183,30 @@ function App() {
         detailLevel,
         outputFormat,
         tone
-      });
+      }, { signal: abortControllerRef.current.signal });
+      
       const result = response.data.documentation;
       setDocumentation(result);
       simulateStreaming(result);
     } catch (err) {
+      if (axios.isCancel(err)) return;
       console.error('Error generating docs:', err);
       setError(err.response?.data?.details || err.message || 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLanguageChange = (newLanguage) => {
+    // Kill active synthesis immediately
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    if (streamingIntervalRef.current) clearInterval(streamingIntervalRef.current);
+    
+    setLanguage(newLanguage);
+    setIsLoading(false);
+    setError(null);
+    setDocumentation('');
+    setStreamingDocumentation('');
   };
 
   const downloadAsMarkdown = () => {
@@ -267,7 +309,7 @@ function App() {
                     <div className="relative premium-card rounded-3xl overflow-hidden backdrop-blur-3xl bg-bg-card/60 h-[480px]">
                       <div className="absolute top-6 left-8 right-8 z-[110] flex items-center justify-between pointer-events-none">
                         <div className="pointer-events-auto">
-                          <CustomDropdown value={language} onChange={setLanguage} options={languages} />
+                          <CustomDropdown value={language} onChange={handleLanguageChange} options={languages} />
                         </div>
                         <div className="pointer-events-auto">
                           <button
@@ -333,7 +375,7 @@ function App() {
                           </>
                         )}
                       </div>
-                      <div className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20">
+                      <div key={language} className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20">
                         {error ? (
                           <div className="h-full flex flex-col items-center justify-center text-center gap-6 py-20">
                             <Terminal size={48} className="text-red-500/50" />
