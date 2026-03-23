@@ -227,6 +227,14 @@ function App() {
     element.click();
   };
 
+  const handleExample = () => {
+    if (language === 'JS') {
+      setCode(`// JavaScript Example: Calculate complexity\nfunction processUserData(users) {\n  return users.filter(user => user.active)\n    .map(user => ({\n        id: user.id,\n        score: user.points * 1.5\n    }));\n}`);
+    } else {
+      setCode(`<?php\n// PHP Example: Iterative processing\nfunction calculate_totals(array $items) {\n    $total = 0;\n    foreach ($items as $item) {\n        if ($item->price > 100) {\n            $total += $item->price * 0.9;\n        }\n    }\n    return $total;\n}`);
+    }
+  };
+
   const languages = ['JS', 'PHP'];
 
   return (
@@ -320,7 +328,13 @@ function App() {
                         <div className="pointer-events-auto">
                           <CustomDropdown value={language} onChange={handleLanguageChange} options={languages} />
                         </div>
-                        <div className="pointer-events-auto">
+                        <div className="pointer-events-auto flex items-center gap-3">
+                          <button
+                            onClick={handleExample}
+                            className="px-6 py-2.5 bg-brand-secondary text-white rounded-xl transition-all font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand-secondary/20 hover:shadow-brand-secondary/40 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+                          >
+                            <span>Example</span>
+                          </button>
                           <button
                             onClick={handleGenerate}
                             disabled={!code.trim() || isLoading}
