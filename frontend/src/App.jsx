@@ -150,7 +150,8 @@ function App() {
         outputFormat,
         tone
       });
-      const result = response.data.documentation;
+      // Added .trim() to ensure no leading whitespace cuts off the first letter 'E'
+      const result = response.data.documentation.trim();
       setDocumentation(result);
       simulateStreaming(result);
     } catch (err) {
@@ -309,13 +310,14 @@ function App() {
                   <div className="relative group/result">
                     <div className={`absolute -inset-[1px] bg-gradient-to-r from-brand-secondary via-transparent to-brand-primary rounded-3xl transition-opacity duration-700 blur-[2px] ${documentation ? 'opacity-40' : 'opacity-10'}`} />
                     <div className="relative premium-card rounded-3xl h-[480px] overflow-hidden backdrop-blur-3xl bg-bg-card/60">
-                      <div className="absolute top-6 right-8 z-[110] flex items-center gap-3">
+                      <div className="absolute top-6 right-8 z-[110] flex items-center gap-4">
                         {documentation && (
                           <>
                             <button
                               onClick={downloadAsMarkdown}
-                              className="px-6 py-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white border border-white/5 transition-all text-[10px] font-black uppercase tracking-widest"
+                              className="px-6 py-2.5 rounded-xl border-2 border-brand-primary/20 bg-brand-primary/5 text-slate-300 hover:text-white hover:border-brand-primary/50 hover:bg-brand-primary/10 transition-all text-[10px] font-black uppercase tracking-widest flex items-center gap-2"
                             >
+                              <Sparkles size={12} />
                               Download .md
                             </button>
                             <button
