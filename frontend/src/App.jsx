@@ -377,10 +377,11 @@ function App() {
                       </div>
                       <div key={language} className="prose max-w-none prose-brand dark:prose-invert overflow-y-auto overflow-x-hidden h-full !pl-10 !pr-4 custom-scrollbar !pt-28 !pb-20">
                         {error ? (
-                          <div className="h-full flex flex-col items-center justify-start text-center gap-6 pt-32">
+                          <div className="h-full flex flex-col items-center justify-start text-center gap-6 pt-32 px-10">
+                            <Terminal size={48} className="text-red-500/50" />
                             <div>
-                              <h3 className="text-xl font-black uppercase tracking-widest text-text-white mb-4">Synthesis Failed</h3>
-                              <p className="text-sm text-slate-500 max-w-sm leading-relaxed px-10">{error}</p>
+                              <h3 className="text-xl font-black uppercase tracking-widest text-text-white mb-2">Synthesis Failed</h3>
+                              <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">{error}</p>
                             </div>
                           </div>
                         ) : isLoading ? (
