@@ -1,6 +1,12 @@
 # DocGen Neural Engine 🚀
 
+[![GitHub Stars](https://img.shields.io/github/stars/HorngKimsomnang/AI_generator?style=for-the-badge&logo=github&color=6366f1)](https://github.com/HorngKimsomnang/AI_generator/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/HorngKimsomnang/AI_generator?style=for-the-badge&logo=github&color=818cf8)](https://github.com/HorngKimsomnang/AI_generator/network/members)
+[![GitHub Repo](https://img.shields.io/badge/Repository-View%20on%20GitHub-black?style=for-the-badge&logo=github)](https://github.com/HorngKimsomnang/AI_generator)
+
 > **AI-Powered Documentation. Redefined.**
+
+![DocGen Hero](./docs/assets/hero.png)
 
 DocGen Neural Engine is a high-performance, AI-driven platform designed to transform raw source code into professional-grade technical documentation. By leveraging advanced **Few-Shot Prompting** and **Chain-of-Thought** reasoning, DocGen bridges the gap between complex logic and human-readable architecture.
 
@@ -52,7 +58,7 @@ Implements a strict **Chain-of-Thought** methodology to calculate Time and Space
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-repo/AI_generator.git
+   git clone https://github.com/HorngKimsomnang/AI_generator.git
    cd AI_generator
    ```
 
