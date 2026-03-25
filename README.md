@@ -2,8 +2,6 @@
 
 > **AI-Powered Documentation. Redefined.**
 
-![DocGen Hero](./docs/assets/hero.png)
-
 DocGen Neural Engine is a high-performance, AI-driven platform designed to transform raw source code into professional-grade technical documentation. By leveraging advanced **Few-Shot Prompting** and **Chain-of-Thought** reasoning, DocGen bridges the gap between complex logic and human-readable architecture.
 
 ---
