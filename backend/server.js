@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Render/browser health routes
-app.get('/api/generate-docs', (req, res) => {
+app.post('/api/generate-docs', (req, res) => {
   res.status(200).json({
     status: 'ok',
     service: 'AI Documentation Generator API',
