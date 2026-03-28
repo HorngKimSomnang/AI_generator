@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
   res.status(200).json({
     status: 'ok',
     service: 'AI Documentation Generator API',
-    endpoint: '/api/generate-docs'
+    endpoint: 'api/generate-docs'
   });
 });
 
